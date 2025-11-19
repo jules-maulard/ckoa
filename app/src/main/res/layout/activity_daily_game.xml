@@ -36,7 +36,7 @@
     <!-- Bouton Guess -->
     <Button
         android:id="@+id/btnGuess"
-        style="@style/MainButton"
+        style="@style/GuessButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/guess"
