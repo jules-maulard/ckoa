@@ -9,9 +9,9 @@ public class Country {
     private final String currency;
     private final String capital;
     private final String[] languages;
-    private final Integer population;
+    private final Long population;
 
-    public Country(String iso3, String englishName, String frenchName, String flag, String[] borders, String currency, String capital, String[] languages, Integer population) {
+    public Country(String iso3, String englishName, String frenchName, String flag, String[] borders, String currency, String capital, String[] languages, Long population) {
         this.iso3 = iso3;
         this.englishName = englishName;
         this.frenchName = frenchName;
@@ -55,7 +55,7 @@ public class Country {
         return languages;
     }
 
-    public Integer getPopulation() {
+    public Long getPopulation() {
         return population;
     }
 }
