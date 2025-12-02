@@ -27,37 +27,56 @@ public class RestCountriesAPI {
             JSONObject countryData = countryArray.getJSONObject(0);
 
             String englishName = countryData.getJSONObject("name").getString("common");
-            String frenchName = countryData.getJSONObject("translations").getJSONObject("fra").getString("common");
-            String flag = countryData.getJSONObject("flags").getString("png");
+
+            String frenchName = null;
+            if (countryData.has("translations") && countryData.getJSONObject("translations").has("fra")) {
+                frenchName = countryData.getJSONObject("translations").getJSONObject("fra").getString("common");
+            }
+
+            String flag = null;
+            if (countryData.has("flags")) {
+                flag = countryData.getJSONObject("flags").optString("png", "");
+            }
 
             String[] borders = null;
-            JSONArray bordersArray = countryData.getJSONArray("borders");
-            borders = new String[bordersArray.length()];
-            for (int i = 0; i < bordersArray.length(); i++) {
-                borders[i] = bordersArray.getString(i);
+            JSONArray bordersArray = countryData.optJSONArray("borders");
+            if (bordersArray != null) {
+                borders = new String[bordersArray.length()];
+                for (int i = 0; i < bordersArray.length(); i++) {
+                    borders[i] = bordersArray.getString(i);
+                }
             }
 
             String currency = null;
-            JSONObject currencies = countryData.getJSONObject("currencies");
-            Iterator<String> keys = currencies.keys();
-            String currencyCode = keys.next();
-            JSONObject currencyObj = currencies.getJSONObject(currencyCode);
-            currency = currencyObj.getString("name") + " (" + currencyCode + ")";
+            JSONObject currencies = countryData.optJSONObject("currencies");
+            if (currencies != null) {
+                Iterator<String> keys = currencies.keys();
+                if (keys.hasNext()) {
+                    String currencyCode = keys.next();
+                    JSONObject currencyObj = currencies.getJSONObject(currencyCode);
+                    currency = currencyObj.optString("name", "") + " (" + currencyCode + ")";
+                }
+            }
 
-            JSONArray capitalArray = countryData.getJSONArray("capital");
-            String capital = capitalArray.getString(0);
+            String capital = null;
+            JSONArray capitalArray = countryData.optJSONArray("capital");
+            if (capitalArray != null && capitalArray.length() > 0) {
+                capital = capitalArray.getString(0);
+            }
 
             String[] languages = null;
-            JSONObject languagesObj = countryData.getJSONObject("languages");
-            List<String> languagesList = new ArrayList<>();
-            Iterator<String> langKeys = languagesObj.keys();
-            while (langKeys.hasNext()) {
-                String langKey = langKeys.next();
-                languagesList.add(languagesObj.getString(langKey));
+            JSONObject languagesObj = countryData.optJSONObject("languages");
+            if (languagesObj != null) {
+                List<String> languagesList = new ArrayList<>();
+                Iterator<String> langKeys = languagesObj.keys();
+                while (langKeys.hasNext()) {
+                    String langKey = langKeys.next();
+                    languagesList.add(languagesObj.getString(langKey));
+                }
+                languages = languagesList.toArray(new String[0]);
             }
-            languages = languagesList.toArray(new String[0]);
 
-            Integer population = countryData.getInt("population");
+            Long population = countryData.getLong("population");
 
             return new Country(
                     iso3Country,
