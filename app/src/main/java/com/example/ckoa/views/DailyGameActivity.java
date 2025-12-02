@@ -1,4 +1,4 @@
-package com.example.ckoa;
+package com.example.ckoa.views;
 
 public class DailyGameActivity {
 
