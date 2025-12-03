@@ -7,15 +7,16 @@
     android:background="@color/background">
 
     <!-- Silhouette du pays -->
-    <ImageView
-        android:id="@+id/countryShape"
+    <com.example.ckoa.views.GeoShapeView
+        android:id="@+id/geoShapeView"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/country_silhouette"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="#FFFFFF"/>
 
     <!-- AutoCompleteTextView pour la proposition -->
     <AutoCompleteTextView
@@ -27,7 +28,7 @@
         android:background="@drawable/input_background"
         android:textColor="@color/primaryText"
         android:textColorHint="@color/hintText"
-        app:layout_constraintTop_toBottomOf="@id/countryShape"
+        app:layout_constraintTop_toBottomOf="@id/geoShapeView"
         android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnGuess"
@@ -40,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/guess"
-        app:layout_constraintTop_toBottomOf="@id/countryShape"
+        app:layout_constraintTop_toBottomOf="@id/geoShapeView"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="12dp"
         android:layout_marginTop="20dp"/>
