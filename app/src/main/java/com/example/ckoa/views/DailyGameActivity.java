@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Random;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import android.widget.ImageButton;
 import com.example.ckoa.views.GeoShapeView;
 import java.io.InputStream;
 import com.example.ckoa.R;
@@ -14,11 +15,12 @@ public class DailyGameActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_game);
-
-        // 1. On récupère juste la vue qui dessine
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
         GeoShapeView geoShapeView = findViewById(R.id.geoShapeView);
 
-        // 2. On charge le fichier et on l'affiche direct
         loadGeoJson(geoShapeView);
     }
 

@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ckoa">
         <activity
+            android:name=".views.HistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".views.MainActivity"
             android:exported="true">
             <intent-filter>
@@ -20,8 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".views.DailyGameActivity" />
+        <activity
+            android:name=".views.DailyGameActivity"
+            android:windowSoftInputMode="adjustNothing"/>
     </application>
 
 </manifest>

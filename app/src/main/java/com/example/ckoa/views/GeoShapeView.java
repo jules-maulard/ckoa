@@ -15,13 +15,9 @@ import org.json.JSONObject;
 public class GeoShapeView extends View {
 
     private final Paint paint = new Paint();
-    // Path original (coordonnées géographiques)
     private final Path originalPath = new Path();
-    // Path transformé (coordonnées écran) pour l'affichage
     private final Path drawPath = new Path();
-    // Limites du path original
     private final RectF bounds = new RectF();
-    // Matrice pour les transformations (mise à l'échelle, centrage)
     private final Matrix matrix = new Matrix();
 
     private boolean isDataLoaded = false;
@@ -66,11 +62,9 @@ public class GeoShapeView extends View {
                 parsePolygon(coordinates);
             }
 
-            // Calculer les limites une seule fois après le chargement
             originalPath.computeBounds(bounds, true);
             isDataLoaded = true;
 
-            // Demander un nouveau dessin
             requestLayout();
             invalidate();
 
@@ -101,7 +95,6 @@ public class GeoShapeView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        // Recalculer la transformation si la taille de la vue change
         updateTransformationMatrix();
     }
 
@@ -117,34 +110,22 @@ public class GeoShapeView extends View {
         float availableWidth = viewWidth - (paddingX * 2);
         float availableHeight = viewHeight - (paddingY * 2);
 
-        // --- CORRECTION DE PROJECTION ---
-        // On récupère la latitude moyenne du pays (le centre vertical)
-        // Note: bounds.centerY() est négatif car on a inversé Y au parsing, on prend la valeur absolue
         double middleLatitude = Math.abs(bounds.centerY());
-
-        // Formule magique : facteur d'étirement vertical = 1 / cos(latitude)
-        // Cela redonne au pays sa "vraie" forme visuelle
         float mapAspectCorrection = (float) (1.0 / Math.cos(Math.toRadians(middleLatitude)));
-        // --------------------------------
 
-        // On calcule la taille "virtuelle" du pays une fois corrigé
         float virtualMapWidth = bounds.width();
         float virtualMapHeight = bounds.height() * mapAspectCorrection;
 
-        // On calcule l'échelle pour faire rentrer cette taille virtuelle dans l'écran
         float scaleX = availableWidth / virtualMapWidth;
         float scaleY = availableHeight / virtualMapHeight;
         float finalScale = Math.min(scaleX, scaleY);
 
         matrix.reset();
 
-        // 1. On remet l'origine en haut à gauche
         matrix.postTranslate(-bounds.left, -bounds.top);
 
-        // 2. On applique l'échelle ET la correction de projection sur l'axe Y
         matrix.postScale(finalScale, finalScale * mapAspectCorrection);
 
-        // 3. On centre le tout
         float finalWidth = virtualMapWidth * finalScale;
         float finalHeight = virtualMapHeight * finalScale;
         float offsetX = (viewWidth - finalWidth) / 2;

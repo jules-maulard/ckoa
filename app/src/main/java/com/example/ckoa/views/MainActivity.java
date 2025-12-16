@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // TODO change DailyGameActivity to HistoryActivity
-                Intent intent = new Intent(MainActivity.this, DailyGameActivity.class);
+                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                 startActivity(intent);
             }
         });
