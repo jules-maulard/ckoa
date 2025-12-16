@@ -8,6 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
+import com.example.ckoa.managers.GameHandler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,5 +38,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GameHandler gameHandler = new GameHandler(MainActivity.this);
+                gameHandler.initData(MainActivity.this);
+            }
+        }).start();
     }
 }

@@ -1,0 +1,58 @@
+@startuml
+
+!define table(x) class x << (T,#FFAAAA) >>
+hide methods
+hide stereotypes
+
+table(DailyGame) {
+  +game_date : DATE <<PK>>
+  target_iso3 : TEXT <<FK>>
+  completed : INTEGER
+}
+
+table(CountryBase) {
+  +iso3 : TEXT <<PK>>
+  name_en : TEXT
+  name_fr : TEXT
+  centroid_lat : REAL
+  centroid_lon : REAL
+  geoshape : TEXT
+}
+
+table(CountryMeta) {
+  +iso3 : TEXT <<FK>> 
+  capital : TEXT
+  capital_lat : REAL
+  capital_lon : REAL
+  currency : TEXT
+  languages : TEXT
+  population : INTEGER
+  flag_url : TEXT
+  coat_of_arms_url : TEXT
+  neighbors : TEXT
+}
+
+table(Guess) {
+  +id : INTEGER <<PK,AUTO>>
+  game_date : DATE <<FK>>
+  attempt : INTEGER
+  guessed_iso3 : TEXT <<FK>>
+  distance_km : REAL
+  bearing_deg : REAL
+  is_correct : INTEGER
+}
+
+' table(User) {
+'   +id : INTEGER <<PK,AUTO>>
+'   username : TEXT
+'   created_at : TEXT
+'   prefs : TEXT   ' JSON (ex: language, notifications)
+' }
+
+CountryBase "1" -- "1" CountryMeta : has >
+CountryBase "1" -- "0..*" DailyGame : target >
+DailyGame "1" -- "0..*" Guess : contains >
+CountryBase "1" -- "0..*" Guess : guessed >
+' User "0..1" -- "0..*" DailyGame : plays >
+
+@enduml

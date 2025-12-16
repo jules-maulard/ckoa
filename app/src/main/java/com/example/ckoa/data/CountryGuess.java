@@ -1,25 +1,42 @@
 package com.example.ckoa.data;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class CountryGuess {
     private final String iso3;
-    private final String englishName;
-    private final String frenchName;
+    private final String game_date;
+    private final Double distance_km;
+    private final Double bearing_deg;
+    private final Boolean is_correct;
 
-    public CountryGuess(String iso3, String englishName, String frenchName) {
+    public CountryGuess(String iso3, Double distance_km, Double bearing_deg, Boolean is_correct) {
         this.iso3 = iso3;
-        this.englishName = englishName;
-        this.frenchName = frenchName;
+        this.game_date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new java.util.Date());
+        this.distance_km = distance_km;
+        this.bearing_deg = bearing_deg;
+        this.is_correct = is_correct;
     }
 
     public String getIso3() {
         return iso3;
     }
 
-    public String getFrenchName() {
-        return frenchName;
+    public Boolean getIs_correct() {
+        return is_correct;
     }
 
-    public String getEnglishName() {
-        return englishName;
+    public String getGame_date() {
+        return game_date;
     }
+
+    public Double getDistance_km() {
+        return distance_km;
+    }
+
+    public Double getBearing_deg() {
+        return bearing_deg;
+    }
+
+
 }
