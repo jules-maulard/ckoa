@@ -1,4 +1,4 @@
-package com.example.ckoa.data;
+package com.example.ckoa.models;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;

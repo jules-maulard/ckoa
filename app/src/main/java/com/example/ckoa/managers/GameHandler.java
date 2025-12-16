@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import com.example.ckoa.data.CountryGuess;
+import com.example.ckoa.models.CountryGuess;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

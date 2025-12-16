@@ -1,6 +1,9 @@
-package com.example.ckoa.data;
+package com.example.ckoa.managers;
 
 import android.util.Log;
+
+import com.example.ckoa.models.Country;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

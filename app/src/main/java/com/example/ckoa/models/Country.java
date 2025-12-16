@@ -1,4 +1,4 @@
-package com.example.ckoa.data;
+package com.example.ckoa.models;
 
 public class Country {
     private final String iso3;
