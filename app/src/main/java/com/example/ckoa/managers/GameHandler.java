@@ -123,6 +123,18 @@ public class GameHandler {
         return id;
     }
 
+    public Cursor getGuessesForDate(String date) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT g.*, c." + DatabaseHelper.KEY_NAME_FR +
+                " FROM " + DatabaseHelper.TABLE_GUESS + " g " +
+                " JOIN " + DatabaseHelper.TABLE_COUNTRY_BASE + " c " +
+                " ON g." + DatabaseHelper.KEY_GUESSED_ISO3 + " = c." + DatabaseHelper.KEY_ISO3 +
+                " WHERE g." + DatabaseHelper.KEY_GAME_DATE + " = ?" +
+                " ORDER BY g." + DatabaseHelper.KEY_ATTEMPT + " ASC";
+
+        return db.rawQuery(query, new String[]{date});
+    }
+
     private int getNumberAttempt(SQLiteDatabase db, String gameDate) {
         int count = 0;
 
