@@ -78,18 +78,15 @@ public class DailyGameActivity extends AppCompatActivity {
 
     private void setupGameData() {
         int dailyId = getDailyCountryId();
-
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT * FROM " + DatabaseHelper.TABLE_COUNTRY_BASE + " LIMIT 1 OFFSET " + (dailyId - 1);
         Cursor cursor = db.rawQuery(query, null);
-
         if (cursor.moveToFirst()) {
             targetIso3 = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_ISO3));
             targetName = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_NAME_FR));
             String geoJson = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_GEOSHAPE));
             targetLat = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_CENTROID_LAT));
             targetLon = cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_CENTROID_LON));
-
             geoShapeView.setGeoJson(geoJson);
             cursor.close();
         }
@@ -100,7 +97,6 @@ public class DailyGameActivity extends AppCompatActivity {
         allCountryNames = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT " + DatabaseHelper.KEY_NAME_FR + " FROM " + DatabaseHelper.TABLE_COUNTRY_BASE, null);
-
         if (cursor.moveToFirst()) {
             do {
                 allCountryNames.add(cursor.getString(0));
@@ -108,7 +104,6 @@ public class DailyGameActivity extends AppCompatActivity {
         }
         cursor.close();
         db.close();
-
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, allCountryNames);
         inputCountry.setAdapter(adapter);
     }
@@ -136,7 +131,7 @@ public class DailyGameActivity extends AppCompatActivity {
                 historyList.add(0, historyItem);
 
                 if (isCorrect == 1 || attemptsCount >= 6) {
-                    endGame(isCorrect == 1);
+                    endGame();
                 }
 
             } while (cursor.moveToNext());
@@ -163,16 +158,26 @@ public class DailyGameActivity extends AppCompatActivity {
 
         if (isWin) {
             historyList.add(0, "🏆 " + targetName + " - Gagné !");
-            endGame(true);
+
+            gameStatsManager.saveGameResult(attemptsCount, true);
+            endGame();
+
         } else {
             if (attemptsCount >= 6) {
-                endGame(false);
+                gameStatsManager.saveGameResult(attemptsCount, false);
+                endGame();
                 Toast.makeText(this, "Perdu ! C'était : " + targetName, Toast.LENGTH_LONG).show();
             } else {
                 inputCountry.setText("");
             }
         }
         historyAdapter.notifyDataSetChanged();
+    }
+
+    private void endGame() {
+        isGameFinished = true;
+        btnGuess.setEnabled(false);
+        inputCountry.setEnabled(false);
     }
 
     private void saveGuessToDb(String guessName, boolean isWin) {
@@ -202,16 +207,6 @@ public class DailyGameActivity extends AppCompatActivity {
             }
         }
         db.close();
-    }
-
-    private void endGame(boolean won) {
-        isGameFinished = true;
-        btnGuess.setEnabled(false);
-        inputCountry.setEnabled(false);
-
-        if (inputCountry.getText().length() > 0 || attemptsCount == 6 || won) {
-            gameStatsManager.saveGameResult(attemptsCount, won);
-        }
     }
 
     private String getDirectionArrow(float bearing) {
