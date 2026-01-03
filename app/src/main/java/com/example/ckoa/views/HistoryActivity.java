@@ -25,16 +25,16 @@ public class HistoryActivity extends AppCompatActivity {
 
     private void setupUI() {
         TextView tvStreak = findViewById(R.id.tvStreakValue);
-        int currentStreak = statsManager.getStreak();
+        int currentStreak = statsManager.getCurrentStreak();
         tvStreak.setText(currentStreak + " 🔥");
 
-        int count1 = statsManager.getWinsIn1();
-        int count2 = statsManager.getWinsIn2();
-        int count3 = statsManager.getWinsIn3();
-        int count4 = statsManager.getWinsIn4();
-        int count5 = statsManager.getWinsIn5();
-        int count6 = statsManager.getWinsIn6();
-        int countFail = statsManager.getFailures();
+        int count1 = statsManager.getWinsForAttemptsCount(1);
+        int count2 = statsManager.getWinsForAttemptsCount(2);
+        int count3 = statsManager.getWinsForAttemptsCount(3);
+        int count4 = statsManager.getWinsForAttemptsCount(4);
+        int count5 = statsManager.getWinsForAttemptsCount(5);
+        int count6 = statsManager.getWinsForAttemptsCount(6);
+        int countFail = statsManager.getTotalFailures();
 
         int maxCount = Math.max(1, Math.max(count1, Math.max(count2, Math.max(count3,
                 Math.max(count4, Math.max(count5, Math.max(count6, countFail)))))));

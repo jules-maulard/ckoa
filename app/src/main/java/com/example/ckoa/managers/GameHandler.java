@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.example.ckoa.models.Country;
 import com.example.ckoa.models.CountryGuess;
 
 import org.json.JSONArray;
@@ -13,6 +15,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.example.ckoa.R;
 
@@ -59,6 +63,11 @@ public class GameHandler {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject obj = jsonArray.getJSONObject(i);
 
+                    if (!obj.getString("status").equals("Member State")) {
+                        Log.d("DEBUG_DB", "Pays non membre : " + obj.getString("name"));
+                        continue;
+                    }
+
                     ContentValues values = new ContentValues();
 
                     values.put(DatabaseHelper.KEY_ISO3, obj.getString("iso3"));
@@ -88,24 +97,6 @@ public class GameHandler {
         }
     }
 
-
-    public long addCountryBase(String iso3, String name_en, String name_fr, Double centroid_lat, Double centroid_lon, String geoshape) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseHelper.KEY_ISO3, iso3);
-        values.put(DatabaseHelper.KEY_NAME_EN, name_en);
-        values.put("name_fr", name_fr);
-        values.put("centroid_lat", centroid_lat);
-        values.put("centroid_lon", centroid_lon);
-        values.put("geoshape", geoshape);
-
-        long id = db.replace(DatabaseHelper.TABLE_COUNTRY_BASE, null, values);
-
-        db.close();
-        return id;
-    }
-
     public long addGuess(CountryGuess guess) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -114,7 +105,7 @@ public class GameHandler {
         values.put(DatabaseHelper.KEY_ATTEMPT, getNumberAttempt(db, guess.getGame_date()));
         values.put(DatabaseHelper.KEY_GUESSED_ISO3, guess.getIso3());
         values.put(DatabaseHelper.KEY_DISTANCE_KM, guess.getDistance_km());
-        values.put("bearing_deg", guess.getBearing_deg());
+        values.put(DatabaseHelper.KEY_BEARING_DEG, guess.getBearing_deg());
         values.put(DatabaseHelper.KEY_IS_CORRECT, guess.getIs_correct());
 
         long id = db.insert(DatabaseHelper.TABLE_GUESS, null, values);
@@ -150,5 +141,45 @@ public class GameHandler {
         cursor.close();
 
         return count;
+    }
+
+
+    public List<String> getRandomIsoCodes(int limit) {
+        List<String> isoCodes = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT " + DatabaseHelper.KEY_ISO3 +
+                        " FROM " + DatabaseHelper.TABLE_COUNTRY_BASE +
+                        " ORDER BY RANDOM() LIMIT " + limit,
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                isoCodes.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return isoCodes;
+    }
+
+    public String getCountryName(String iso) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String name = "";
+
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_COUNTRY_BASE,
+                new String[]{DatabaseHelper.KEY_NAME_FR},
+                DatabaseHelper.KEY_ISO3 + "=?",
+                new String[]{iso},
+                null, null, null
+        );
+
+        if (cursor.moveToFirst()) {
+            name = cursor.getString(0);
+        }
+        cursor.close();
+        return name;
     }
 }

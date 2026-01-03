@@ -1,9 +1,12 @@
 package com.example.ckoa.views;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -15,6 +18,8 @@ import com.example.ckoa.R;
 import com.example.ckoa.managers.DatabaseHelper;
 import com.example.ckoa.managers.GameHandler;
 import com.example.ckoa.managers.GameStatsManager;
+import com.example.ckoa.managers.RestCountriesAPI;
+import com.example.ckoa.models.Country;
 import com.example.ckoa.models.CountryGuess;
 
 import java.text.SimpleDateFormat;
@@ -24,8 +29,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class DailyGameActivity extends AppCompatActivity {
+public class DailyShapeActivity extends AppCompatActivity {
 
     private GeoShapeView geoShapeView;
     private AutoCompleteTextView inputCountry;
@@ -178,6 +185,32 @@ public class DailyGameActivity extends AppCompatActivity {
         isGameFinished = true;
         btnGuess.setEnabled(false);
         inputCountry.setEnabled(false);
+        transitionToFlagGame();
+    }
+
+    private void transitionToFlagGame() {
+        // Toast.makeText(this, "Chargement du niveau suivant...", Toast.LENGTH_SHORT).show();
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            RestCountriesAPI api = new RestCountriesAPI();
+            Country countryData = api.getCountry(targetIso3);
+
+            mainHandler.post(() -> {
+                if (countryData != null) {
+                    Intent intent = new Intent(DailyShapeActivity.this, DailyFlagActivity.class);
+                    intent.putExtra("TARGET_ISO3", countryData.getIso3());
+                    intent.putExtra("TARGET_NAME", countryData.getFrenchName());
+                    intent.putExtra("TARGET_FLAG_URL", countryData.getFlag());
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(DailyShapeActivity.this, "Erreur de connexion pour le niveau suivant", Toast.LENGTH_LONG).show();
+                }
+            });
+        });
     }
 
     private void saveGuessToDb(String guessName, boolean isWin) {

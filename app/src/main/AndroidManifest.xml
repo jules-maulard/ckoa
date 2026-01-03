@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.DailyGameActivity"
+            android:name=".views.DailyShapeActivity"
             android:windowSoftInputMode="adjustNothing"/>
     </application>
 

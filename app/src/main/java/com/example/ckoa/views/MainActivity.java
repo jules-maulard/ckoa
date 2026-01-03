@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         btnDaily.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DailyGameActivity.class);
+                Intent intent = new Intent(MainActivity.this, DailyShapeActivity.class);
                 startActivity(intent);
             }
         });
@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO change DailyGameActivity to HistoryActivity
                 Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                 startActivity(intent);
             }
