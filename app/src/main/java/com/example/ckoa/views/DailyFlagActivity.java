@@ -1,32 +1,40 @@
 package com.example.ckoa.views;
 
 import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-import com.example.ckoa.R;
-import com.example.ckoa.managers.GameHandler;
+import android.widget.Toast;
 
-import java.util.Collections;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ckoa.R;
+import com.example.ckoa.managers.FlagGameManager;
+
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 public class DailyFlagActivity extends AppCompatActivity {
 
-    private GameHandler gameHandler;
-    private String targetIso;
+    private FlagGameManager gameManager;
     private TextView textTargetCountry;
     private ImageButton[] flagButtons;
+
+    private boolean isRoundFinished = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_guess_flag);
+        setContentView(R.layout.activity_daily_flag);
 
-        gameHandler = new GameHandler(this);
+        gameManager = new FlagGameManager(this);
+
         initViews();
-        startNewRound();
+        setupDailyRound();
     }
 
     private void initViews() {
@@ -40,47 +48,92 @@ public class DailyFlagActivity extends AppCompatActivity {
         };
     }
 
-    private void startNewRound() {
-        List<String> isos = gameHandler.getRandomIsoCodes(6);
-        if (isos.size() < 6) return;
+    private void setupDailyRound() {
+        FlagGameManager.FlagRoundData data = gameManager.prepareDailyRound();
 
-        targetIso = isos.get(0);
+        if (data == null) {
+            Toast.makeText(this, "Error loading data", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
-        String targetName = gameHandler.getCountryName(targetIso);
-        textTargetCountry.setText(targetName);
+        textTargetCountry.setText(data.targetName);
+        List<String> options = data.optionsIso;
 
-        Collections.shuffle(isos);
+        int loopLimit = Math.min(options.size(), flagButtons.length);
 
-        for (int i = 0; i < flagButtons.length; i++) {
-            String iso = isos.get(i);
+        for (int i = 0; i < loopLimit; i++) {
+            String iso = options.get(i);
             ImageButton button = flagButtons[i];
 
-            button.setImageResource(getFlagResId(iso));
-            button.setTag(iso); // On stocke l'ISO dans le bouton
+            button.setTag(iso);
             button.setOnClickListener(this::onFlagClicked);
+
+            loadFlagImage(iso, button);
         }
+    }
+
+    private void loadFlagImage(String iso, ImageButton button) {
+        new Thread(() -> {
+            try {
+                // 1. On récupère l'URL (peut prendre du temps si appel API)
+                String flagUrl = gameManager.getFlagUrl(iso);
+
+                // Si l'URL est nulle (API erreur), on s'arrête là
+                if (flagUrl == null || flagUrl.isEmpty()) {
+                    runOnUiThread(() -> button.setImageResource(R.drawable.ic_launcher_background));
+                    return;
+                }
+
+                // 2. Connexion HTTP robuste pour éviter les images "vides"
+                java.net.URL url = new java.net.URL(flagUrl);
+                java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+
+                // 3. On récupère le flux et on le transforme en Bitmap
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+
+                // 4. Affichage
+                if (bitmap != null) {
+                    runOnUiThread(() -> button.setImageBitmap(bitmap));
+                } else {
+                    // Si le décodage a échoué malgré tout
+                    runOnUiThread(() -> button.setImageResource(R.drawable.ic_launcher_background));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> button.setImageResource(R.drawable.ic_launcher_background));
+            }
+        }).start();
     }
 
     private void onFlagClicked(View view) {
-        String selectedIso = (String) view.getTag();
+        if (isRoundFinished) return;
 
-        if (selectedIso.equals(targetIso)) {
-            // Victoire -> Recharger une manche ou changer d'écran
-            startNewRound();
-        } else {
-            // Défaite
+        String selectedIso = (String) view.getTag();
+        boolean isCorrect = gameManager.checkGuess(selectedIso);
+
+        if (isCorrect) {
+            isRoundFinished = true;
+
             new AlertDialog.Builder(this)
-                    .setTitle("Faux !")
-                    .setMessage("Mauvais drapeau.")
-                    .setPositiveButton("OK", null)
+                    .setTitle("Bravo !")
+                    .setMessage("Correct answer!")
+                    .setCancelable(false)
+                    .setPositiveButton("Finish", (dialog, which) -> finish())
+                    .show();
+        } else {
+            view.setEnabled(false);
+            view.setAlpha(0.5f);
+            new AlertDialog.Builder(this)
+                    .setTitle("Lost !")
+                    .setMessage("Wrong flag. Not " + selectedIso)
+                    .setCancelable(false)
+                    .setPositiveButton("Quit", null)
                     .show();
         }
-    }
-
-    private int getFlagResId(String isoCode) {
-        // Supposons que tes images s'appellent "flag_fra", "flag_deu", etc.
-        String resourceName = "flag_" + isoCode.toLowerCase();
-        int resId = getResources().getIdentifier(resourceName, "drawable", getPackageName());
-        return (resId != 0) ? resId : R.drawable.ic_launcher_background;
     }
 }

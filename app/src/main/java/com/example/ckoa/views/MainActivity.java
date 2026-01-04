@@ -8,7 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
-import com.example.ckoa.managers.GameHandler;
+import com.example.ckoa.managers.data.GameRepository;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                GameHandler gameHandler = new GameHandler(MainActivity.this);
-                gameHandler.initData(MainActivity.this);
+                GameRepository repository = new GameRepository(MainActivity.this);
+                repository.prepareDatabase();
             }
         }).start();
     }

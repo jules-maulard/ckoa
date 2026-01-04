@@ -26,6 +26,10 @@
         <activity
             android:name=".views.DailyShapeActivity"
             android:windowSoftInputMode="adjustNothing"/>
+        <activity
+            android:name=".views.DailyFlagActivity"
+            android:windowSoftInputMode="adjustNothing"/>
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
