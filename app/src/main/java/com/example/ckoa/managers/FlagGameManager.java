@@ -38,13 +38,12 @@ public class FlagGameManager {
 
         String correctIso = targetCountry.getIso3();
 
-        List<String> options = repository.getRandomIsoCodes(5);
+        List<String> options = repository.getRandomIsoCodes(6);
 
-        if (options.contains(correctIso)) {
-            options.remove(correctIso);
-            options.add(repository.getRandomIsoCodes(1).get(0));
+        if (!options.contains(correctIso)) {
+            options.remove(0);
+            options.add(correctIso);
         }
-        options.add(correctIso);
         Collections.shuffle(options);
 
         return new FlagRoundData(targetCountry.getNameFr(), correctIso, options);
@@ -61,5 +60,9 @@ public class FlagGameManager {
             return meta.getFlag();
         }
         return null;
+    }
+
+    public String getCountryNameByIso(String iso) {
+        return repository.getCountryNameFr(iso);
     }
 }

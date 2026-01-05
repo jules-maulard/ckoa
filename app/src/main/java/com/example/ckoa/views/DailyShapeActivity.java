@@ -63,10 +63,7 @@ public class DailyShapeActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> finish());
         btnGuess.setOnClickListener(v -> processGuess());
-        btnNextLevel.setOnClickListener(v -> {
-            startActivity(new Intent(this, DailyFlagActivity.class));
-            finish();
-        });
+        btnNextLevel.setOnClickListener(v -> startActivity(new Intent(this, DailyFlagActivity.class)));
     }
 
     private void loadShapeView() {

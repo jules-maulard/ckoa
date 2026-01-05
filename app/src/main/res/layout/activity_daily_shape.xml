@@ -47,7 +47,7 @@
         android:id="@+id/geoShapeView"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="70dp"
         android:scaleType="fitCenter"
         android:contentDescription="@string/country_silhouette"
         android:background="#FFFFFF"

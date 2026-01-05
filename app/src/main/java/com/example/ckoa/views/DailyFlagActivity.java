@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -11,18 +13,23 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.ckoa.R;
 import com.example.ckoa.managers.FlagGameManager;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DailyFlagActivity extends AppCompatActivity {
 
     private FlagGameManager gameManager;
     private TextView textTargetCountry;
     private ImageButton[] flagButtons;
+    private ExecutorService executor;
+    private Handler handler;
 
     private boolean isRoundFinished = false;
 
@@ -30,6 +37,9 @@ public class DailyFlagActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_flag);
+
+        executor = Executors.newFixedThreadPool(1);
+        handler = new Handler(Looper.getMainLooper());
 
         gameManager = new FlagGameManager(this);
 
@@ -60,7 +70,7 @@ public class DailyFlagActivity extends AppCompatActivity {
         textTargetCountry.setText(data.targetName);
         List<String> options = data.optionsIso;
 
-        int loopLimit = Math.min(options.size(), flagButtons.length);
+        int loopLimit = flagButtons.length;
 
         for (int i = 0; i < loopLimit; i++) {
             String iso = options.get(i);
@@ -74,40 +84,20 @@ public class DailyFlagActivity extends AppCompatActivity {
     }
 
     private void loadFlagImage(String iso, ImageButton button) {
-        new Thread(() -> {
-            try {
-                // 1. On récupère l'URL (peut prendre du temps si appel API)
-                String flagUrl = gameManager.getFlagUrl(iso);
+        executor.execute(() -> {
+            String flagUrl = gameManager.getFlagUrl(iso);
 
-                // Si l'URL est nulle (API erreur), on s'arrête là
-                if (flagUrl == null || flagUrl.isEmpty()) {
-                    runOnUiThread(() -> button.setImageResource(R.drawable.ic_launcher_background));
-                    return;
-                }
+            handler.post(() -> {
+                if (isDestroyed() || isFinishing()) return;
 
-                // 2. Connexion HTTP robuste pour éviter les images "vides"
-                java.net.URL url = new java.net.URL(flagUrl);
-                java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-
-                // 3. On récupère le flux et on le transforme en Bitmap
-                InputStream input = connection.getInputStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(input);
-
-                // 4. Affichage
-                if (bitmap != null) {
-                    runOnUiThread(() -> button.setImageBitmap(bitmap));
-                } else {
-                    // Si le décodage a échoué malgré tout
-                    runOnUiThread(() -> button.setImageResource(R.drawable.ic_launcher_background));
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> button.setImageResource(R.drawable.ic_launcher_background));
-            }
-        }).start();
+                Glide.with(this)
+                        .load(flagUrl)
+                        .placeholder(R.drawable.ic_launcher_background)
+                        .error(R.drawable.ic_launcher_background)
+                        .fitCenter()
+                        .into(button);
+            });
+        });
     }
 
     private void onFlagClicked(View view) {
@@ -123,17 +113,21 @@ public class DailyFlagActivity extends AppCompatActivity {
                     .setTitle("Bravo !")
                     .setMessage("Correct answer!")
                     .setCancelable(false)
-                    .setPositiveButton("Finish", (dialog, which) -> finish())
+                    .setPositiveButton("Finish", null)
                     .show();
         } else {
             view.setEnabled(false);
             view.setAlpha(0.5f);
-            new AlertDialog.Builder(this)
-                    .setTitle("Lost !")
-                    .setMessage("Wrong flag. Not " + selectedIso)
-                    .setCancelable(false)
-                    .setPositiveButton("Quit", null)
-                    .show();
+            String countryName = gameManager.getCountryNameByIso(selectedIso);
+            Toast.makeText(this, "Lost ! Wrong flag. Not " + countryName, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (executor != null) {
+            executor.shutdown();
         }
     }
 }
