@@ -109,6 +109,23 @@ public class GameRepository {
         return count;
     }
 
+    private void saveCountryMeta(CountryMeta meta) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(DatabaseInitializer.KEY_ISO3, meta.getIso3());
+        values.put(DatabaseInitializer.KEY_CAPITAL, meta.getCapital());
+        values.put(DatabaseInitializer.KEY_CURRENCY, meta.getCurrency());
+        values.put(DatabaseInitializer.KEY_POPULATION, meta.getPopulation());
+        values.put(DatabaseInitializer.KEY_FLAG_URL, meta.getFlag());
+        values.put(DatabaseInitializer.KEY_LANGUAGES, arrayToString(meta.getLanguages()));
+        values.put(DatabaseInitializer.KEY_NEIGHBORS, arrayToString(meta.getBorders()));
+
+        db.insertWithOnConflict(DatabaseInitializer.TABLE_COUNTRY_META,
+                null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+    }
+
 
     public CountryMeta getCountryMeta(String iso3) {
         CountryMeta localMeta = getMetaFromDb(iso3);
@@ -124,23 +141,6 @@ public class GameRepository {
         return remoteMeta;
     }
 
-    private void saveCountryMeta(CountryMeta meta) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseInitializer.KEY_ISO3, meta.getIso3());
-        values.put(DatabaseInitializer.KEY_CAPITAL, meta.getCapital());
-        values.put(DatabaseInitializer.KEY_CURRENCY, meta.getCurrency());
-        values.put(DatabaseInitializer.KEY_POPULATION, meta.getPopulation());
-        values.put(DatabaseInitializer.KEY_FLAG_URL, meta.getFlag());
-
-        // Conversion Array -> String (ex: ["fr","en"] -> "fr,en")
-        values.put(DatabaseInitializer.KEY_LANGUAGES, arrayToString(meta.getLanguages()));
-        values.put(DatabaseInitializer.KEY_NEIGHBORS, arrayToString(meta.getBorders()));
-
-        db.insertWithOnConflict(DatabaseInitializer.TABLE_COUNTRY_META, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
-    }
 
     private CountryMeta getMetaFromDb(String iso3) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
