@@ -7,7 +7,6 @@ import android.location.Location;
 import com.example.ckoa.managers.data.DatabaseInitializer;
 import com.example.ckoa.managers.data.GameRepository;
 import com.example.ckoa.models.CountryBase;
-import com.example.ckoa.models.CountryMeta;
 import com.example.ckoa.models.Guess;
 
 import java.text.SimpleDateFormat;
