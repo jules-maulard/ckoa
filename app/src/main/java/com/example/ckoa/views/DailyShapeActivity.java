@@ -131,7 +131,7 @@ public class DailyShapeActivity extends AppCompatActivity {
         boolean isWin = guess.getIs_correct();
         String emoji = isWin ? "🏆" : "❌";
 
-        String arrow = isWin ? "" : gameManager.getDirectionArrow(guess.getBearing_deg().floatValue());
+        String arrow = isWin ? "" : gameManager.getDirectionArrow(guess.getBearing_deg());
 
         String historyItem = isWin
                 ? String.format("%s %s - Won!", emoji, countryName)

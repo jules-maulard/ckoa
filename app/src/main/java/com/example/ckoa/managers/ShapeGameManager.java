@@ -109,9 +109,9 @@ public class ShapeGameManager {
     }
 
 
-    public String getDirectionArrow(float bearing) {
+    public String getDirectionArrow(double bearing) {
         String arrows = "⬆↗➡↘⬇↙⬅↖";
-        int index = Math.round(((bearing % 360) + 360) % 360 / 45);
+        int index = (int) Math.round(((bearing % 360) + 360) % 360 / 45.0);
         return String.valueOf(arrows.charAt(index % 8));
     }
 
