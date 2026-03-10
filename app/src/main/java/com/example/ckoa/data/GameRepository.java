@@ -8,7 +8,7 @@ import android.text.TextUtils;
 
 import com.example.ckoa.models.CountryBase;
 import com.example.ckoa.models.CountryMeta;
-import com.example.ckoa.models.Guess;
+import com.example.ckoa.models.ShapeGuess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,16 +67,16 @@ public class GameRepository {
         return name;
     }
 
-    public long addGuess(Guess guess) {
+    public long addGuess(ShapeGuess shapeGuess) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(DatabaseInitializer.KEY_GAME_DATE, guess.getGame_date());
-        values.put(DatabaseInitializer.KEY_ATTEMPT, getAttemptNumber(db, guess.getGame_date()) + 1);
-        values.put(DatabaseInitializer.KEY_GUESSED_ISO3, guess.getIso3());
-        values.put(DatabaseInitializer.KEY_DISTANCE_KM, guess.getDistance_km());
-        values.put(DatabaseInitializer.KEY_BEARING_DEG, guess.getBearing_deg());
-        values.put(DatabaseInitializer.KEY_IS_CORRECT, guess.getIs_correct());
+        values.put(DatabaseInitializer.KEY_GAME_DATE, shapeGuess.getGame_date());
+        values.put(DatabaseInitializer.KEY_ATTEMPT, getAttemptNumber(db, shapeGuess.getGame_date()) + 1);
+        values.put(DatabaseInitializer.KEY_GUESSED_ISO3, shapeGuess.getIso3());
+        values.put(DatabaseInitializer.KEY_DISTANCE_KM, shapeGuess.getDistance_km());
+        values.put(DatabaseInitializer.KEY_BEARING_DEG, shapeGuess.getBearing_deg());
+        values.put(DatabaseInitializer.KEY_IS_CORRECT, shapeGuess.getIs_correct());
 
         long id = db.insert(DatabaseInitializer.TABLE_GUESS, null, values);
         db.close();

@@ -7,7 +7,7 @@ import android.location.Location;
 import com.example.ckoa.data.DatabaseInitializer;
 import com.example.ckoa.data.GameRepository;
 import com.example.ckoa.models.CountryBase;
-import com.example.ckoa.models.Guess;
+import com.example.ckoa.models.ShapeGuess;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,27 +48,27 @@ public class ShapeGameManager {
         return repository.getGuessesForDate(todayDate);
     }
 
-    public List<Guess> getHistoryGuesses() {
-        List<Guess> guesses = new ArrayList<>();
+    public List<ShapeGuess> getHistoryGuesses() {
+        List<ShapeGuess> shapeGuesses = new ArrayList<>();
         Cursor cursor = repository.getGuessesForDate(todayDate);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 // Conversion propre : SQL -> Objet Java
-                Guess guess = new Guess(
+                ShapeGuess shapeGuess = new ShapeGuess(
                         cursor.getString(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_GUESSED_ISO3)),
                         cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_DISTANCE_KM)),
                         cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_BEARING_DEG)),
                         cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_IS_CORRECT)) == 1
                 );
-                guesses.add(guess);
+                shapeGuesses.add(shapeGuess);
             } while (cursor.moveToNext());
             cursor.close();
         }
-        return guesses;
+        return shapeGuesses;
     }
 
-    public Guess makeGuess(String guessName) {
+    public ShapeGuess makeGuess(String guessName) {
         if (targetCountry == null) return null;
 
         // Récupérer les infos du pays deviné
@@ -91,16 +91,16 @@ public class ShapeGameManager {
         boolean isWin = guessCountry.getIso3().equals(targetCountry.getIso3());
 
         // Créer et sauvegarder le Guess
-        Guess guess = new Guess(
+        ShapeGuess shapeGuess = new ShapeGuess(
                 guessCountry.getIso3(),
                 distanceKm,
                 bearing,
                 isWin
         );
 
-        repository.addGuess(guess);
+        repository.addGuess(shapeGuess);
 
-        return guess;
+        return shapeGuess;
     }
 
     public String getTargetName() {

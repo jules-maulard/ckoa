@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.ckoa.R;
 import com.example.ckoa.managers.GameStatsManager;
 import com.example.ckoa.managers.ShapeGameManager;
-import com.example.ckoa.models.Guess;
+import com.example.ckoa.models.ShapeGuess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,15 +83,15 @@ public class DailyShapeActivity extends AppCompatActivity {
     }
 
     private void loadHistory() {
-        List<Guess> guesses = gameManager.getHistoryGuesses();
+        List<ShapeGuess> shapeGuesses = gameManager.getHistoryGuesses();
 
-        for (Guess guess : guesses) {
+        for (ShapeGuess shapeGuess : shapeGuesses) {
             attemptsCount++;
-            String countryName = gameManager.getCountryNameByIso(guess.getIso3());
+            String countryName = gameManager.getCountryNameByIso(shapeGuess.getIso3());
 
-            addGuessToHistory(guess, countryName);
+            addGuessToHistory(shapeGuess, countryName);
 
-            if (guess.getIs_correct() || attemptsCount >= 6) {
+            if (shapeGuess.getIs_correct() || attemptsCount >= 6) {
                 endGame();
             }
         }
@@ -103,7 +103,7 @@ public class DailyShapeActivity extends AppCompatActivity {
         String guessName = inputCountry.getText().toString().trim();
         if (guessName.isEmpty()) return;
 
-        Guess result = gameManager.makeGuess(guessName);
+        ShapeGuess result = gameManager.makeGuess(guessName);
 
         if (result == null) {
             Toast.makeText(this, "Unknown country", Toast.LENGTH_SHORT).show();
@@ -127,15 +127,15 @@ public class DailyShapeActivity extends AppCompatActivity {
         }
     }
 
-    private void addGuessToHistory(Guess guess, String countryName) {
-        boolean isWin = guess.getIs_correct();
+    private void addGuessToHistory(ShapeGuess shapeGuess, String countryName) {
+        boolean isWin = shapeGuess.getIs_correct();
         String emoji = isWin ? "🏆" : "❌";
 
-        String arrow = isWin ? "" : gameManager.getDirectionArrow(guess.getBearing_deg());
+        String arrow = isWin ? "" : gameManager.getDirectionArrow(shapeGuess.getBearing_deg());
 
         String historyItem = isWin
                 ? String.format("%s %s - Won!", emoji, countryName)
-                : String.format("%s %s : %.0f km %s", emoji, countryName, guess.getDistance_km(), arrow);
+                : String.format("%s %s : %.0f km %s", emoji, countryName, shapeGuess.getDistance_km(), arrow);
 
         historyList.add(0, historyItem);
         historyAdapter.notifyDataSetChanged();

@@ -3,7 +3,7 @@
     <string name="daily_button">Daily</string>
     <string name="history_button">Historique</string>
     <string name="enter_country">Votre proposition</string>
-    <string name="guess">Valider</string>
+    <string name="shapeGuess">Valider</string>
     <string name="history">Historique</string>
     <string name="country_silhouette">Silhouette du pays</string>
 </resources>

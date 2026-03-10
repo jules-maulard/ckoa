@@ -76,7 +76,7 @@
         style="@style/GuessButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/guess"
+        android:text="@string/shapeGuess"
         android:layout_marginEnd="16dp"
         app:layout_constraintTop_toTopOf="@id/inputCountry"
         app:layout_constraintBottom_toBottomOf="@id/inputCountry"
