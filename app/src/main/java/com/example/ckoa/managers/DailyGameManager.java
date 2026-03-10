@@ -1,6 +1,6 @@
 package com.example.ckoa.managers;
 
-import com.example.ckoa.managers.data.GameRepository;
+import com.example.ckoa.data.GameRepository;
 import com.example.ckoa.models.CountryBase;
 import java.util.Calendar;
 import java.util.Random;

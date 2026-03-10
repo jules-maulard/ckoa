@@ -1,4 +1,4 @@
-package com.example.ckoa.managers.data;
+package com.example.ckoa.data;
 
 import android.util.Log;
 

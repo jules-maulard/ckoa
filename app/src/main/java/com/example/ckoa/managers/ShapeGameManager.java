@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
 
-import com.example.ckoa.managers.data.DatabaseInitializer;
-import com.example.ckoa.managers.data.GameRepository;
+import com.example.ckoa.data.DatabaseInitializer;
+import com.example.ckoa.data.GameRepository;
 import com.example.ckoa.models.CountryBase;
 import com.example.ckoa.models.Guess;
 

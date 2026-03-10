@@ -8,7 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
-import com.example.ckoa.managers.data.GameRepository;
+import com.example.ckoa.data.GameRepository;
 
 public class MainActivity extends AppCompatActivity {
 

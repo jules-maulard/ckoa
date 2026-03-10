@@ -2,7 +2,7 @@ package com.example.ckoa.managers;
 
 import android.content.Context;
 
-import com.example.ckoa.managers.data.GameRepository;
+import com.example.ckoa.data.GameRepository;
 import com.example.ckoa.models.CountryBase;
 import com.example.ckoa.models.CountryMeta;
 
