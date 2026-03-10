@@ -72,7 +72,7 @@ public class ProgressRepository {
         preferences.edit().putString(KEY_SHAPE_GUESSES, json).apply();
     }
 
-    private List<ShapeGuess> getShapeGuesses() {
+    public List<ShapeGuess> getShapeGuesses() {
         String json = preferences.getString(KEY_SHAPE_GUESSES, null);
         if (json == null) {
             return new ArrayList<>();
@@ -86,7 +86,7 @@ public class ProgressRepository {
         preferences.edit().putString(KEY_FLAG_GUESSES, json).apply();
     }
 
-    private List<FlagGuess> getFlagGuesses() {
+    public List<FlagGuess> getFlagGuesses() {
         String json = preferences.getString(KEY_FLAG_GUESSES, null);
         if (json == null) {
             return new ArrayList<>();
