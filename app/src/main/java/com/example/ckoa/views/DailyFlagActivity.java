@@ -1,8 +1,6 @@
 package com.example.ckoa.views;
 
 import android.app.AlertDialog;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,15 +8,14 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.ckoa.R;
+import com.example.ckoa.data.ProgressRepository;
 import com.example.ckoa.managers.FlagGameManager;
+import com.example.ckoa.models.DailyStep;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -109,11 +106,14 @@ public class DailyFlagActivity extends AppCompatActivity {
         if (isCorrect) {
             isRoundFinished = true;
 
+            ProgressRepository progressRepository = new ProgressRepository(this);
+            progressRepository.saveCurrentStep(DailyStep.DONE);
+
             new AlertDialog.Builder(this)
                     .setTitle("Bravo !")
                     .setMessage("Correct answer!")
                     .setCancelable(false)
-                    .setPositiveButton("Finish", null)
+                    .setPositiveButton("Finish", (dialog, which) -> finish())
                     .show();
         } else {
             view.setEnabled(false);

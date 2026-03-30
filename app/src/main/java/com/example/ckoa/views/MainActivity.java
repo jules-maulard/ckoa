@@ -2,67 +2,59 @@ package com.example.ckoa.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
 import com.example.ckoa.data.GameRepository;
+import com.example.ckoa.data.ProgressRepository;
+import com.example.ckoa.managers.ShapeGameManager;
+import com.example.ckoa.models.DailyStep;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnDaily, btnHistory;
+    private Button dailyButton;
+    private Button historyButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnDaily = findViewById(R.id.btnDaily);
-        btnHistory = findViewById(R.id.btnHistory);
+        initializeViews();
 
-        btnDaily.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DailyShapeActivity.class);
-                startActivity(intent);
-            }
+        dailyButton.setOnClickListener(view -> {
+            ProgressRepository progressRepository = new ProgressRepository(this);
+            DailyStep currentStep = progressRepository.getCurrentStep();
+            navigateToStep(currentStep);
         });
 
-        btnHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                startActivity(intent);
-            }
+        historyButton.setOnClickListener(view -> {
+            Intent intent = new Intent(this, HistoryActivity.class);
+            startActivity(intent);
         });
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                GameRepository repository = new GameRepository(MainActivity.this);
-                repository.prepareDatabase();
-            }
+        new Thread(() -> {
+            GameRepository repository = new GameRepository(this);
+            repository.prepareDatabase();
         }).start();
     }
+
+    private void initializeViews() {
+        dailyButton = findViewById(R.id.btnDaily);
+        historyButton = findViewById(R.id.btnHistory);
+    }
+
+    private void navigateToStep(DailyStep step) {
+        Intent intent;
+        if (step == DailyStep.FLAG) {
+            intent = new Intent(this, DailyFlagActivity.class);
+        } else if (step == DailyStep.DONE) {
+            intent = new Intent(this, DailyShapeActivity.class);
+        } else {
+            intent = new Intent(this, DailyShapeActivity.class);
+        }
+        startActivity(intent);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

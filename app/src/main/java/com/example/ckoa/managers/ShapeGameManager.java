@@ -1,37 +1,104 @@
 package com.example.ckoa.managers;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.location.Location;
 
-import com.example.ckoa.data.DatabaseInitializer;
 import com.example.ckoa.data.GameRepository;
+import com.example.ckoa.data.ProgressRepository;
 import com.example.ckoa.models.CountryBase;
+import com.example.ckoa.models.DailyStep;
 import com.example.ckoa.models.ShapeGuess;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 public class ShapeGameManager {
 
     private final GameRepository repository;
-
+    private final ProgressRepository progressRepository;
+    private final GameStatsManager gameStatsManager;
     private CountryBase targetCountry;
-    private final String todayDate;
+
+    private int attemptsCount = 0;
+    private boolean isGameFinished = false;
+    private final int MAX_ATTEMPTS = 6;
 
     public ShapeGameManager(Context context) {
         this.repository = new GameRepository(context);
-        this.todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        this.progressRepository = new ProgressRepository(context);
+        this.gameStatsManager = new GameStatsManager(context);
+    }
+
+    public void loadGameState() {
+        List<ShapeGuess> history = getHistoryGuesses();
+        attemptsCount = history.size();
+        for (ShapeGuess guess : history) {
+            if (guess.getIs_correct() || attemptsCount >= MAX_ATTEMPTS) {
+                isGameFinished = true;
+                break;
+            }
+        }
+    }
+
+    public boolean isGameFinished() {
+        return isGameFinished;
+    }
+
+    public boolean isGameLost() {
+        return isGameFinished && attemptsCount >= MAX_ATTEMPTS;
+    }
+
+    public List<ShapeGuess> getHistoryGuesses() {
+        return progressRepository.getShapeGuesses();
+    }
+
+    public ShapeGuess processUserGuess(String guessName) {
+        if (isGameFinished) return null;
+
+        CountryBase guessCountry = repository.getCountryByName(guessName);
+        if (guessCountry == null) return null;
+
+        float[] results = new float[2];
+        Location.distanceBetween(
+                guessCountry.getCentroidLat(), guessCountry.getCentroidLon(),
+                targetCountry.getCentroidLat(), targetCountry.getCentroidLon(),
+                results
+        );
+        double distanceKm = results[0] / 1000.0;
+        double bearing = results[1];
+
+        boolean isWin = guessCountry.getIso3().equals(targetCountry.getIso3());
+        ShapeGuess shapeGuess = new ShapeGuess(guessCountry.getIso3(), distanceKm, bearing, isWin);
+
+        List<ShapeGuess> currentGuesses = progressRepository.getShapeGuesses();
+        currentGuesses.add(shapeGuess);
+        progressRepository.saveShapeGuesses(currentGuesses);
+
+        attemptsCount++;
+
+        if (isWin) {
+            gameStatsManager.saveGameResult(attemptsCount, true);
+            finishGame();
+        } else if (attemptsCount >= MAX_ATTEMPTS) {
+            gameStatsManager.saveGameResult(attemptsCount, false);
+            finishGame();
+        }
+
+        return shapeGuess;
+    }
+
+    private void finishGame() {
+        isGameFinished = true;
+        advanceToNextStep();
+    }
+
+    private void advanceToNextStep() {
+        progressRepository.saveCurrentStep(DailyStep.FLAG);
     }
 
     public String loadDailyTarget() {
         int dailyId = getDailyCountryId();
-        // offset SQL commence à 0, donc dailyId - 1
         this.targetCountry = repository.getCountryByOffset(dailyId - 1);
 
         if (this.targetCountry != null) {
@@ -44,74 +111,24 @@ public class ShapeGameManager {
         return repository.getAllCountryNames();
     }
 
-    public Cursor getTodayHistory() {
-        return repository.getGuessesForDate(todayDate);
-    }
-
-    public List<ShapeGuess> getHistoryGuesses() {
-        List<ShapeGuess> shapeGuesses = new ArrayList<>();
-        Cursor cursor = repository.getGuessesForDate(todayDate);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                // Conversion propre : SQL -> Objet Java
-                ShapeGuess shapeGuess = new ShapeGuess(
-                        cursor.getString(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_GUESSED_ISO3)),
-                        cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_DISTANCE_KM)),
-                        cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_BEARING_DEG)),
-                        cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseInitializer.KEY_IS_CORRECT)) == 1
-                );
-                shapeGuesses.add(shapeGuess);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-        return shapeGuesses;
-    }
-
-    public ShapeGuess makeGuess(String guessName) {
-        if (targetCountry == null) return null;
-
-        // Récupérer les infos du pays deviné
-        CountryBase guessCountry = repository.getCountryByName(guessName);
-        if (guessCountry == null) {
-            return null; // Pays inconnu
-        }
-
-        // Calculer distance et bearing
-        float[] results = new float[2];
-        Location.distanceBetween(
-                guessCountry.getCentroidLat(), guessCountry.getCentroidLon(),
-                targetCountry.getCentroidLat(), targetCountry.getCentroidLon(),
-                results
-        );
-        double distanceKm = results[0] / 1000.0;
-        double bearing = results[1];
-
-        // Vérifier victoire
-        boolean isWin = guessCountry.getIso3().equals(targetCountry.getIso3());
-
-        // Créer et sauvegarder le Guess
-        ShapeGuess shapeGuess = new ShapeGuess(
-                guessCountry.getIso3(),
-                distanceKm,
-                bearing,
-                isWin
-        );
-
-        repository.addGuess(shapeGuess);
-
-        return shapeGuess;
-    }
-
     public String getTargetName() {
         return targetCountry != null ? targetCountry.getNameFr() : "";
     }
 
-
-    public String getDirectionArrow(double bearing) {
+    private String getDirectionArrow(double bearing) {
         String arrows = "⬆↗➡↘⬇↙⬅↖";
         int index = (int) Math.round(((bearing % 360) + 360) % 360 / 45.0);
         return String.valueOf(arrows.charAt(index % 8));
+    }
+
+    public String formatHistoryItem(ShapeGuess shapeGuess, String countryName) {
+        boolean isWin = shapeGuess.getIs_correct();
+        String emoji = isWin ? "🏆" : "❌";
+        String arrow = isWin ? "" : getDirectionArrow(shapeGuess.getBearing_deg());
+
+        return isWin
+                ? String.format("%s %s - Won!", emoji, countryName)
+                : String.format("%s %s : %.0f km %s", emoji, countryName, shapeGuess.getDistance_km(), arrow);
     }
 
     private int getDailyCountryId() {

@@ -9,11 +9,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
-import com.example.ckoa.managers.GameStatsManager;
 import com.example.ckoa.managers.ShapeGameManager;
 import com.example.ckoa.models.ShapeGuess;
 
@@ -22,129 +20,115 @@ import java.util.List;
 
 public class DailyShapeActivity extends AppCompatActivity {
 
-    private GeoShapeView geoShapeView;
-    private AutoCompleteTextView inputCountry;
-    private ListView listHistory;
-    private Button btnGuess;
-    private ImageButton btnBack;
-    private Button btnNextLevel;
-
     private ShapeGameManager gameManager;
-    private GameStatsManager gameStatsManager;
 
-    private ArrayAdapter<String> historyAdapter;
+    private ImageButton backButton;
+    private Button nextLevelButton;
+    private GeoShapeView geoShapeView;
+    private AutoCompleteTextView countryInput;
+    private Button guessButton;
+    private ListView historyListView;
+
     private List<String> historyList;
-
-    private int attemptsCount = 0;
-    private boolean isGameFinished = false;
+    private ArrayAdapter<String> historyAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_shape);
 
-        geoShapeView = findViewById(R.id.geoShapeView);
-        inputCountry = findViewById(R.id.inputCountry);
-        listHistory = findViewById(R.id.listHistory);
-        btnGuess = findViewById(R.id.btnGuess);
-        btnBack = findViewById(R.id.btnBack);
-        btnNextLevel = findViewById(R.id.btnNextLevel);
-
         gameManager = new ShapeGameManager(this);
-        gameStatsManager = new GameStatsManager(this);
 
-        historyList = new ArrayList<>();
-        historyAdapter = new ArrayAdapter<>(this, R.layout.item_guess, historyList);
-        listHistory.setAdapter(historyAdapter);
+        initializeViews();
 
         loadShapeView();
         setupAutoComplete();
+        initializeHistoryAdapter();
         loadHistory();
 
-        btnBack.setOnClickListener(v -> finish());
-        btnGuess.setOnClickListener(v -> processGuess());
-        btnNextLevel.setOnClickListener(v -> startActivity(new Intent(this, DailyFlagActivity.class)));
+        backButton.setOnClickListener(v -> finish());
+        guessButton.setOnClickListener(v -> submitGuess());
+        nextLevelButton.setOnClickListener(v -> startActivity(new Intent(this, DailyFlagActivity.class)));
+    }
+
+    private void initializeViews() {
+        geoShapeView = findViewById(R.id.geoShapeView);
+        countryInput = findViewById(R.id.inputCountry);
+        historyListView = findViewById(R.id.listHistory);
+        guessButton = findViewById(R.id.btnGuess);
+        backButton = findViewById(R.id.btnBack);
+        nextLevelButton = findViewById(R.id.btnNextLevel);
+    }
+
+    private void initializeHistoryAdapter() {
+        historyList = new ArrayList<>();
+        historyAdapter = new ArrayAdapter<>(this, R.layout.item_guess, historyList);
+        historyListView.setAdapter(historyAdapter);
     }
 
     private void loadShapeView() {
         String geoJson = gameManager.loadDailyTarget();
-        if (geoJson != null) {
-            geoShapeView.setGeoJson(geoJson);
-        } else {
+
+        if (geoJson == null) {
             Toast.makeText(this, "Game loading failed", Toast.LENGTH_SHORT).show();
             finish();
+            return;
         }
+
+        geoShapeView.setGeoJson(geoJson);
     }
 
     private void setupAutoComplete() {
         List<String> allCountryNames = gameManager.getAllCountryNames();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, allCountryNames);
-        inputCountry.setAdapter(adapter);
+        countryInput.setAdapter(adapter);
     }
 
     private void loadHistory() {
+        gameManager.loadGameState();
         List<ShapeGuess> shapeGuesses = gameManager.getHistoryGuesses();
 
         for (ShapeGuess shapeGuess : shapeGuesses) {
-            attemptsCount++;
             String countryName = gameManager.getCountryNameByIso(shapeGuess.getIso3());
+            addGuessToUI(shapeGuess, countryName);
+        }
 
-            addGuessToHistory(shapeGuess, countryName);
-
-            if (shapeGuess.getIs_correct() || attemptsCount >= 6) {
-                endGame();
-            }
+        if (gameManager.isGameFinished()) {
+            disableGameInteractions();
         }
     }
 
-    private void processGuess() {
-        if (isGameFinished) return;
-
-        String guessName = inputCountry.getText().toString().trim();
+    private void submitGuess() {
+        String guessName = countryInput.getText().toString().trim();
         if (guessName.isEmpty()) return;
 
-        ShapeGuess result = gameManager.makeGuess(guessName);
+        ShapeGuess result = gameManager.processUserGuess(guessName);
 
         if (result == null) {
             Toast.makeText(this, "Unknown country", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        attemptsCount++;
-        addGuessToHistory(result, guessName);
+        addGuessToUI(result, guessName);
+        countryInput.setText("");
 
-        if (result.getIs_correct()) {
-            gameStatsManager.saveGameResult(attemptsCount, true);
-            endGame();
-        } else {
-            if (attemptsCount >= 6) {
-                gameStatsManager.saveGameResult(attemptsCount, false);
-                endGame();
+        if (gameManager.isGameFinished()) {
+            disableGameInteractions();
+            if (gameManager.isGameLost()) {
                 Toast.makeText(this, "Lost! It was: " + gameManager.getTargetName(), Toast.LENGTH_LONG).show();
-            } else {
-                inputCountry.setText("");
             }
         }
     }
 
-    private void addGuessToHistory(ShapeGuess shapeGuess, String countryName) {
-        boolean isWin = shapeGuess.getIs_correct();
-        String emoji = isWin ? "🏆" : "❌";
-
-        String arrow = isWin ? "" : gameManager.getDirectionArrow(shapeGuess.getBearing_deg());
-
-        String historyItem = isWin
-                ? String.format("%s %s - Won!", emoji, countryName)
-                : String.format("%s %s : %.0f km %s", emoji, countryName, shapeGuess.getDistance_km(), arrow);
-
+    private void addGuessToUI(ShapeGuess shapeGuess, String countryName) {
+        String historyItem = gameManager.formatHistoryItem(shapeGuess, countryName);
         historyList.add(0, historyItem);
         historyAdapter.notifyDataSetChanged();
     }
 
-    private void endGame() {
-        isGameFinished = true;
-        btnGuess.setEnabled(false);
-        inputCountry.setEnabled(false);
-        btnNextLevel.setVisibility(View.VISIBLE);
+    private void disableGameInteractions() {
+        guessButton.setEnabled(false);
+        countryInput.setEnabled(false);
+        nextLevelButton.setVisibility(View.VISIBLE);
     }
 }
