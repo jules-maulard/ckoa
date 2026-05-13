@@ -1,10 +1,11 @@
-package com.example.ckoa.managers;
+package com.example.ckoa.feature.daily_flag_guess;
 
 import android.content.Context;
 
-import com.example.ckoa.data.GameRepository;
-import com.example.ckoa.models.CountryBase;
-import com.example.ckoa.models.CountryMeta;
+import com.example.ckoa.core.country.GameRepository;
+import com.example.ckoa.core.country.CountryBase;
+import com.example.ckoa.core.country.CountryMeta;
+import com.example.ckoa.feature.home.DailyGameManager;
 
 import java.util.Collections;
 import java.util.List;

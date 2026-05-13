@@ -1,4 +1,4 @@
-package com.example.ckoa.views;
+package com.example.ckoa.feature.daily_shape_guess;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
-import com.example.ckoa.managers.ShapeGameManager;
-import com.example.ckoa.models.ShapeGuess;
+import com.example.ckoa.feature.daily_flag_guess.DailyFlagActivity;
 
 import java.util.ArrayList;
 import java.util.List;

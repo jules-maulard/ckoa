@@ -1,4 +1,4 @@
-package com.example.ckoa.models;
+package com.example.ckoa.feature.daily_shape_guess;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;

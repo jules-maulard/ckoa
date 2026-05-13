@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ckoa">
         <activity
-            android:name=".views.HistoryActivity"
+            android:name=".feature.history.HistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".views.MainActivity"
+            android:name=".feature.home.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,10 +24,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.DailyShapeActivity"
+            android:name=".feature.daily_shape_guess.DailyShapeActivity"
             android:windowSoftInputMode="adjustNothing"/>
         <activity
-            android:name=".views.DailyFlagActivity"
+            android:name=".feature.daily_flag_guess.DailyFlagActivity"
             android:windowSoftInputMode="adjustNothing"/>
     </application>
 

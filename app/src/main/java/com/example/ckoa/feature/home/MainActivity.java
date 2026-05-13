@@ -1,4 +1,4 @@
-package com.example.ckoa.views;
+package com.example.ckoa.feature.home;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,10 +7,12 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
-import com.example.ckoa.data.GameRepository;
-import com.example.ckoa.data.ProgressRepository;
-import com.example.ckoa.managers.ShapeGameManager;
-import com.example.ckoa.models.DailyStep;
+import com.example.ckoa.core.country.GameRepository;
+import com.example.ckoa.core.progress.ProgressRepository;
+import com.example.ckoa.core.progress.DailyStep;
+import com.example.ckoa.feature.daily_flag_guess.DailyFlagActivity;
+import com.example.ckoa.feature.daily_shape_guess.DailyShapeActivity;
+import com.example.ckoa.feature.history.HistoryActivity;
 
 public class MainActivity extends AppCompatActivity {
 

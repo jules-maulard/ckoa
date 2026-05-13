@@ -1,4 +1,4 @@
-package com.example.ckoa.data;
+package com.example.ckoa.core.country;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,9 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import com.example.ckoa.models.CountryBase;
-import com.example.ckoa.models.CountryMeta;
-import com.example.ckoa.models.ShapeGuess;
+import com.example.ckoa.feature.daily_shape_guess.ShapeGuess;
 
 import java.util.ArrayList;
 import java.util.List;

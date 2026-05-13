@@ -1,4 +1,4 @@
-package com.example.ckoa.views;
+package com.example.ckoa.feature.history;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +8,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ckoa.R;
-import com.example.ckoa.managers.GameStatsManager;
 
 public class HistoryActivity extends AppCompatActivity {
 

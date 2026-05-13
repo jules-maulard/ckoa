@@ -1,11 +1,10 @@
-package com.example.ckoa.data;
+package com.example.ckoa.core.progress;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.ckoa.models.DailyStep;
-import com.example.ckoa.models.FlagGuess;
-import com.example.ckoa.models.ShapeGuess;
+import com.example.ckoa.feature.daily_flag_guess.FlagGuess;
+import com.example.ckoa.feature.daily_shape_guess.ShapeGuess;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

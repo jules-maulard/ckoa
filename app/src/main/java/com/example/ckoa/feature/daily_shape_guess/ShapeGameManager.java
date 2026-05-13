@@ -1,13 +1,13 @@
-package com.example.ckoa.managers;
+package com.example.ckoa.feature.daily_shape_guess;
 
 import android.content.Context;
 import android.location.Location;
 
-import com.example.ckoa.data.GameRepository;
-import com.example.ckoa.data.ProgressRepository;
-import com.example.ckoa.models.CountryBase;
-import com.example.ckoa.models.DailyStep;
-import com.example.ckoa.models.ShapeGuess;
+import com.example.ckoa.core.country.GameRepository;
+import com.example.ckoa.core.progress.ProgressRepository;
+import com.example.ckoa.core.country.CountryBase;
+import com.example.ckoa.core.progress.DailyStep;
+import com.example.ckoa.feature.history.GameStatsManager;
 
 import java.util.Calendar;
 import java.util.List;

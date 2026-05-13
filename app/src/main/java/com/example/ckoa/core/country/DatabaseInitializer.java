@@ -1,4 +1,4 @@
-package com.example.ckoa.data;
+package com.example.ckoa.core.country;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;

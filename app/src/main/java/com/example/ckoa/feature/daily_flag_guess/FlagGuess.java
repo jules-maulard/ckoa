@@ -1,4 +1,4 @@
-package com.example.ckoa.models;
+package com.example.ckoa.feature.daily_flag_guess;
 
 public class FlagGuess {
     private String selectedIso3;

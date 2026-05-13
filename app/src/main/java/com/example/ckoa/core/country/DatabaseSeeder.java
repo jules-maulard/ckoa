@@ -1,4 +1,4 @@
-package com.example.ckoa.data;
+package com.example.ckoa.core.country;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.ckoa.R;
-import com.example.ckoa.models.CountryBase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

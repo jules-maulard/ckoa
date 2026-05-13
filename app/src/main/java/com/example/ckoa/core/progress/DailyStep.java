@@ -1,4 +1,4 @@
-package com.example.ckoa.models;
+package com.example.ckoa.core.progress;
 
 public enum DailyStep {
     SHAPE,

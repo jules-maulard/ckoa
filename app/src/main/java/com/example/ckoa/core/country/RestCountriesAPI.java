@@ -1,8 +1,6 @@
-package com.example.ckoa.data;
+package com.example.ckoa.core.country;
 
 import android.util.Log;
-
-import com.example.ckoa.models.CountryMeta;
 
 import org.json.JSONArray;
 import org.json.JSONException;

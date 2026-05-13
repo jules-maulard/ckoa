@@ -1,4 +1,4 @@
-package com.example.ckoa.views;
+package com.example.ckoa.feature.daily_flag_guess;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -12,9 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.ckoa.R;
-import com.example.ckoa.data.ProgressRepository;
-import com.example.ckoa.managers.FlagGameManager;
-import com.example.ckoa.models.DailyStep;
+import com.example.ckoa.core.progress.ProgressRepository;
+import com.example.ckoa.core.progress.DailyStep;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
