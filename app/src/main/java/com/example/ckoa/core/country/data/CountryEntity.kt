@@ -10,4 +10,6 @@ data class CountryEntity(
     val capital: String,
     val currency: String,
     val languages: String,
+    val geoJsonCoordinates: String?,
+    val flagDrawableName: String,
 )

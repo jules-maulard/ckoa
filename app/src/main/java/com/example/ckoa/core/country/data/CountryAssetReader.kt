@@ -26,6 +26,8 @@ class CountryAssetReader(
             val currency = extractFirstCurrencyName(countryObject)
             val languages = extractLanguagesAsJsonString(countryObject)
 
+            val geoJson = readGeoShape(isoCode)
+
             countries.add(
                 CountryEntity(
                     isoCode = isoCode,
@@ -33,6 +35,8 @@ class CountryAssetReader(
                     capital = capital,
                     currency = currency,
                     languages = languages,
+                    geoJsonCoordinates = geoJson,
+                    flagDrawableName = isoCode.lowercase()
                 )
             )
         }
@@ -83,5 +87,14 @@ class CountryAssetReader(
             }
         }
         return languagesArray.toString()
+    }
+
+    private fun readGeoShape(isoCode: String): String {
+        return try {
+            val fileName = "shapes/${isoCode.uppercase()}.json"
+            context.assets.open(fileName).bufferedReader().use { it.readText() }
+        } catch (exception: Exception) {
+            ""
+        }
     }
 }

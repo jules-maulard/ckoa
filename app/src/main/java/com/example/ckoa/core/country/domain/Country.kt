@@ -6,4 +6,6 @@ data class Country(
     val capital: String,
     val currency: String,
     val languages: List<String>,
+    val geoJsonCoordinates: String?,
+    val flagDrawableName: String
 )
