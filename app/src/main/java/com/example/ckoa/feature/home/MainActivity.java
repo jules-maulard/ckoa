@@ -11,7 +11,7 @@ import com.example.ckoa.core.country.GameRepository;
 import com.example.ckoa.core.progress.ProgressRepository;
 import com.example.ckoa.core.progress.DailyStep;
 import com.example.ckoa.feature.daily_flag_guess.DailyFlagActivity;
-import com.example.ckoa.feature.daily_shape_guess.DailyShapeActivity;
+import com.example.ckoa.feature.daily_shape_guess.presentation.DailyShapeActivity;
 import com.example.ckoa.feature.history.HistoryActivity;
 
 public class MainActivity extends AppCompatActivity {

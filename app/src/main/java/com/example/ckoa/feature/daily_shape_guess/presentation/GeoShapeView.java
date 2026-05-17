@@ -1,4 +1,5 @@
-package com.example.ckoa.feature.daily_shape_guess;
+package com.example.ckoa.feature.daily_shape_guess.presentation;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;

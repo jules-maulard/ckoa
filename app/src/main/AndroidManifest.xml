@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".feature.daily_shape_guess.DailyShapeActivity"
+            android:name=".feature.daily_shape_guess.presentation.DailyShapeActivity"
             android:windowSoftInputMode="adjustNothing"/>
         <activity
             android:name=".feature.daily_flag_guess.DailyFlagActivity"
