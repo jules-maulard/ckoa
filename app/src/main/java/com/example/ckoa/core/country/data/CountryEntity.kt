@@ -7,9 +7,11 @@ import androidx.room.PrimaryKey
 data class CountryEntity(
     @PrimaryKey val isoCode: String,
     val name: String,
+    val latitude: Double,
+    val longitude: Double,
     val capital: String,
     val currency: String,
     val languages: String,
     val geoJsonCoordinates: String?,
-    val flagDrawableName: String,
+    val flagDrawableName: String
 )

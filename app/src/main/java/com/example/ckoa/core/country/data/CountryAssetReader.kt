@@ -25,6 +25,7 @@ class CountryAssetReader(
             val capital = extractFirstCapital(countryObject)
             val currency = extractFirstCurrencyName(countryObject)
             val languages = extractLanguagesAsJsonString(countryObject)
+            val coordinates = extractCoordinates(countryObject)
 
             val geoJson = readGeoShape(isoCode)
 
@@ -32,6 +33,8 @@ class CountryAssetReader(
                 CountryEntity(
                     isoCode = isoCode,
                     name = name,
+                    latitude = coordinates.first,
+                    longitude = coordinates.second,
                     capital = capital,
                     currency = currency,
                     languages = languages,
@@ -87,6 +90,15 @@ class CountryAssetReader(
             }
         }
         return languagesArray.toString()
+    }
+
+    private fun extractCoordinates(countryObject: JSONObject): Pair<Double, Double> {
+        val latLngArray = countryObject.optJSONArray("latlng")
+        return if (latLngArray != null && latLngArray.length() == 2) {
+            Pair(latLngArray.getDouble(0), latLngArray.getDouble(1))
+        } else {
+            Pair(0.0, 0.0)
+        }
     }
 
     private fun readGeoShape(isoCode: String): String {

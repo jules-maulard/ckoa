@@ -37,6 +37,8 @@ class CountryRepositoryImpl (
         return Country(
             isoCode = entity.isoCode,
             name = entity.name,
+            latitude = entity.latitude,
+            longitude = entity.longitude,
             capital = entity.capital,
             currency = entity.currency,
             languages = languagesList,
